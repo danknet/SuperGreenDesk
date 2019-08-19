@@ -58,12 +58,14 @@ static void watering_task(void *param) {
     ESP_LOGI(SGO_LOG_EVENT, "@WATERING %ld %d\n", now, last);
 
     if (now - last > period) {
-      set_lastwatering(last);
+      ESP_LOGI(SGO_LOG_EVENT, "@WATERING start\n");
+      set_lastwatering(now);
       set_iswatering(1);
       gpio_set_level(GPIO_OUTPUT_WATERING, true);
       vTaskDelay(duration * 1000 / portTICK_PERIOD_MS);
       gpio_set_level(GPIO_OUTPUT_WATERING, false);
       set_iswatering(0);
+      ESP_LOGI(SGO_LOG_EVENT, "@WATERING stop\n");
     }
     vTaskDelay(5 * 1000 / portTICK_PERIOD_MS);
   }
