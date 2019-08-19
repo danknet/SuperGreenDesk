@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-name: PicklePreRelease
+name: SuperGreenLamp
 
 core_modules:
 
@@ -26,39 +26,25 @@ core_modules:
   - stat_dump
   - time
   - mqtt
-  - i2c
   - reboot
 
 custom_modules:
+
+  - watering
   - led
   - mixer
   - state
-  - status_led
   - timer
   - onoff
   - manual
   - box
 
 init_modules:
-  - status_led
   - state
   - led
   - timer
   - mixer
-
-i2c_devices:
-  - sht21
-
-# This is why I intend to move away from mustache templates
-
-i2c_params:
-  - sda
-  - scl
-  - enabled
-
-i2c_loop_i:
-  - 0
-  - 1
+  - watering
 
 # TODO generate this with a command
 
@@ -73,15 +59,11 @@ box_params:
   - off_min
   - stretch
   - led_dim    
-  - sht21_temp_c
-  - sht21_temp_f
-  - sht21_humi 
 
 # This is why I intend to move away from mustache templates
 
 box_loop_i:
   - 0
-  - 1
 
 led_params:
   - duty
@@ -96,7 +78,6 @@ led_params:
 
 led_loop_i:
   - 0
-  - 1
 
 keys:
 
@@ -168,7 +149,7 @@ keys:
       key: MDNSD
     http:
       write: true
-    default: pickle
+    default: supergreencontroller
 
   - name: wifi_ip
     caps_name: WIFI_IP
@@ -212,7 +193,7 @@ keys:
       key: OTA_TMSTP
     http:
       write: true
-    default: OTA_BUILD_TIMESTAMP
+    default_var: OTA_BUILD_TIMESTAMP
 
   - name: ota_server_ip
     caps_name: OTA_SERVER_IP
@@ -248,14 +229,14 @@ keys:
       key: OTA_BASEDIR
     http:
       write: true
-    default: /PicklePreRelease
+    default: /SuperGreenController
 
   - name: ota_status
     caps_name: OTA_STATUS
     integer: true
     http:
       noop: true
-    default: OTA_STATUS_IDLE
+    default_var: OTA_STATUS_IDLE
 
   - name: broker_url
     caps_name: BROKER_URL
@@ -283,78 +264,6 @@ keys:
     http:
       write: true
     default: ""
-
-  - name: i2c_0_sda
-    caps_name: I2C_0_SDA
-    integer: true
-    i2c:
-      index: 0
-      param: sda
-    nvs:
-      key: I2C_0_SDA
-    http:
-      write: true
-    default: 18
-
-  - name: i2c_0_scl
-    caps_name: I2C_0_SCL
-    integer: true
-    i2c:
-      index: 0
-      param: scl
-    nvs:
-      key: I2C_0_SCL
-    http:
-      write: true
-    default: 5
-
-  - name: i2c_0_enabled
-    caps_name: I2C_0_ENABLED
-    integer: true
-    i2c:
-      index: 0
-      param: enabled
-    nvs:
-      key: I2C_0_E
-    http:
-      write: true
-    default: 1
-
-  - name: i2c_1_sda
-    caps_name: I2C_1_SDA
-    integer: true
-    i2c:
-      index: 1
-      param: sda
-    nvs:
-      key: I2C_1_SDA
-    http:
-      write: true
-    default: 21
-
-  - name: i2c_1_scl
-    caps_name: I2C_1_SCL
-    integer: true
-    i2c:
-      index: 1
-      param: scl
-    nvs:
-      key: I2C_1_SCL
-    http:
-      write: true
-    default: 19
-
-  - name: i2c_1_enabled
-    caps_name: I2C_1_ENABLED
-    integer: true
-    i2c:
-      index: 1
-      param: enabled
-    nvs:
-      key: I2C_1_E
-    http:
-      write: true
-    default: 1
 
   - name: reboot
     caps_name: REBOOT
@@ -390,34 +299,7 @@ keys:
       write: true
     http:
       write: true
-    default: Pickle
-
-  - name: status_led_red_gpio
-    caps_name: STATUS_LED_RED_GPIO
-    integer: true
-    nvs:
-      key: SL_R_IO
-    http:
-      write: true
-    default: 23
-    
-  - name: status_led_green_gpio
-    caps_name: STATUS_LED_GREEN_GPIO
-    integer: true
-    nvs:
-      key: SL_G_IO
-    http:
-      write: true
-    default: 22
-
-  - name: status_led_dim
-    caps_name: STATUS_LED_DIM
-    integer: true
-    nvs:
-      key: SL_R_D
-    http:
-      write: true
-    default: 50
+    default: SuperGreenController
 
   #
   # Boxes configurations
@@ -576,42 +458,6 @@ keys:
     write_cb: true
     default: 0
 
-  - name: box_0_sht21_temp_c
-    caps_name: BOX_0_SHT21_TEMP_C
-    integer: true
-    box:
-      index: 0
-      param: sht21_temp_c
-    nvs:
-      key: B_0_SHT21_C
-    http:
-      noop: true
-    default: -1000000
-
-  - name: box_0_sht21_temp_f
-    caps_name: BOX_0_SHT21_TEMP_F
-    integer: true
-    box:
-      index: 0
-      param: sht21_temp_f
-    nvs:
-      key: B_0_SHT21_F
-    http:
-      noop: true
-    default: -1000000
-
-  - name: box_0_sht21_humi
-    caps_name: BOX_0_SHT21_HUMI
-    integer: true
-    box:
-      index: 0
-      param: sht21_humi
-    nvs:
-      key: B_0_SHT21_HU
-    http:
-      noop: true
-    default: -1000000
-
   - name: box_0_led_info
     caps_name: BOX_0_LED_INFO
     string: true
@@ -621,180 +467,6 @@ keys:
     ble:
       uuid: "{0x96,0xc5,0x14,0x21,0x97,0x6a,0x70,0x18,0x34,0x52,0xce,0x6d,0xfe,0x81,0xf7,0x6d}"
       notify: true
-    http:
-      noop: true
-    default: ""
-
-  #
-  # BOX 1
-  #
-
-  - name: box_1_enabled
-    caps_name: BOX_1_ENABLED
-    integer: true
-    box:
-      index: 1
-      param: enabled
-    nvs:
-      key: B_1_E
-    http:
-      write: true
-    default: 1
-
-  - name: box_1_timer_type
-    caps_name: BOX_1_TIMER_TYPE
-    integer: true
-    box:
-      index: 1
-      param: timer_type
-    nvs:
-      key: B_1_TT
-      manual: true
-    http:
-      write: true
-    write_cb: true
-    default_var: TIMER_MANUAL
-
-  - name: box_1_timer_output
-    caps_name: BOX_1_TIMER_OUTPUT
-    integer: true
-    box:
-      index: 1
-      param: timer_output
-    nvs:
-      key: B_1_TO
-    http:
-      noop: true
-    default: 0
-
-  - name: box_1_started_at
-    caps_name: BOX_1_STARTED_AT
-    integer: true
-    box:
-      index: 1
-      param: started_at
-    nvs:
-      key: B_1_ST_AT
-    http:
-      write: true
-    default: 0
-
-  - name: box_1_on_hour
-    caps_name: BOX_1_ON_HOUR
-    integer: true
-    box:
-      index: 1
-      param: on_hour
-    nvs:
-      key: B_1_ON_H
-    http:
-      write: true
-    default: 1
-
-  - name: box_1_on_min
-    caps_name: BOX_1_ON_MIN
-    integer: true
-    box:
-      index: 1
-      param: on_min
-    nvs:
-      key: B_1_ON_M
-    http:
-      write: true
-    default: 0
-
-  - name: box_1_off_hour
-    caps_name: BOX_1_OFF_HOUR
-    integer: true
-    box:
-      index: 1
-      param: off_hour
-    nvs:
-      key: B_1_OFF_H
-    http:
-      write: true
-    default: 19
-
-  - name: box_1_off_min
-    caps_name: BOX_1_OFF_MIN
-    integer: true
-    box:
-      index: 1
-      param: off_min
-    nvs:
-      key: B_1_OFF_M
-    http:
-      write: true
-    default: 0
-
-  - name: box_1_stretch
-    caps_name: BOX_1_STRETCH
-    integer: true
-    box:
-      index: 1
-      param: stretch
-    nvs:
-      key: B_1_STRETCH
-    http:
-      write: true
-    write_cb: true
-    default: 0
-
-  - name: box_1_led_dim
-    caps_name: BOX_1_LED_DIM
-    integer: true
-    box:
-      index: 1
-      param: led_dim
-    nvs:
-      key: B_1_L_DIM
-    http:
-      write: true
-    write_cb: true
-    default: 0
-
-  - name: box_1_sht21_temp_c
-    caps_name: BOX_1_SHT21_TEMP_C
-    integer: true
-    box:
-      index: 1
-      param: sht21_temp_c
-    nvs:
-      key: B_1_SHT21_C
-    http:
-      noop: true
-    default: -1000000
-
-  - name: box_1_sht21_temp_f
-    caps_name: BOX_1_SHT21_TEMP_F
-    integer: true
-    box:
-      index: 1
-      param: sht21_temp_f
-    nvs:
-      key: B_1_SHT21_F
-    http:
-      noop: true
-    default: -1000000
-
-  - name: box_1_sht21_humi
-    caps_name: BOX_1_SHT21_HUMI
-    integer: true
-    box:
-      index: 1
-      param: sht21_humi
-    nvs:
-      key: B_1_SHT21_HU
-    http:
-      noop: true
-    default: -1000000
-
-  - name: box_1_led_info
-    caps_name: BOX_1_LED_INFO
-    string: true
-    box:
-      index: 1
-      param: led_info
     http:
       noop: true
     default: ""
@@ -816,19 +488,6 @@ keys:
     write_cb: true
     default: 0
 
-  - name: led_1_duty
-    caps_name: LED_1_DUTY
-    integer: true
-    led:
-      index: 1
-      param: duty
-    nvs:
-      key: L_1_D
-    http:
-      write: true
-    write_cb: true
-    default: 0
-
   - name: led_0_gpio
     caps_name: LED_0_GPIO
     integer: true
@@ -839,19 +498,7 @@ keys:
       key: L_0_IO
     http:
       write: true
-    default: 26
-
-  - name: led_1_gpio
-    caps_name: LED_1_GPIO
-    integer: true
-    led:
-      index: 1
-      param: gpio
-    nvs:
-      key: L_1_IO
-    http:
-      write: true
-    default: 27
+    default: 33
 
   - name: led_0_x
     caps_name: LED_0_X
@@ -861,18 +508,6 @@ keys:
       param: x
     nvs:
       key: L_0_X
-    http:
-      write: true
-    default: 0
-
-  - name: led_1_x
-    caps_name: LED_1_X
-    integer: true
-    led:
-      index: 1
-      param: x
-    nvs:
-      key: L_1_X
     http:
       write: true
     default: 0
@@ -889,18 +524,6 @@ keys:
       write: true
     default: 0
 
-  - name: led_1_y
-    caps_name: LED_1_Y
-    integer: true
-    led:
-      index: 1
-      param: y
-    nvs:
-      key: L_1_Y
-    http:
-      write: true
-    default: 0
-
   - name: led_0_z
     caps_name: LED_0_Z
     integer: true
@@ -909,18 +532,6 @@ keys:
       param: z
     nvs:
       key: L_0_Z
-    http:
-      write: true
-    default: 0
-
-  - name: led_1_z
-    caps_name: LED_1_Z
-    integer: true
-    led:
-      index: 1
-      param: z
-    nvs:
-      key: L_1_Z
     http:
       write: true
     default: 0
@@ -937,18 +548,6 @@ keys:
       write: true
     default: 1
 
-  - name: led_1_enabled
-    caps_name: LED_1_ENABLED
-    integer: true
-    led:
-      index: 1
-      param: enabled
-    nvs:
-      key: L_1_E
-    http:
-      write: true
-    default: 1
-
   - name: led_0_box
     caps_name: LED_0_BOX
     integer: true
@@ -961,18 +560,6 @@ keys:
       write: true
     default: 0
 
-  - name: led_1_box
-    caps_name: LED_1_BOX
-    integer: true
-    led:
-      index: 1
-      param: box
-    nvs:
-      key: L_1_B
-    http:
-      write: true
-    default: 1
-
   - name: led_0_dim
     caps_name: LED_0_DIM
     integer: true
@@ -981,19 +568,6 @@ keys:
       param: dim
     nvs:
       key: L_0_DI
-    http:
-      write: true
-    write_cb: true
-    default: 100
-
-  - name: led_1_dim
-    caps_name: LED_1_DIM
-    integer: true
-    led:
-      index: 1
-      param: dim
-    nvs:
-      key: L_1_DI
     http:
       write: true
     write_cb: true
@@ -1011,14 +585,42 @@ keys:
       write: true
     default: 1
 
-  - name: led_1_fade
-    caps_name: LED_1_FADE
-    led:
-      index: 1
-      param: fade
+  #
+  # Watering keys
+  #
+
+  - name: wateringperiod
+    caps_name: WATERINGPERIOD
     integer: true
     nvs:
-      key: L_1_F
+      key: WPERIOD
     http:
       write: true
-    default: 1
+    default: 172800
+
+  - name: wateringduration
+    caps_name: WATERINGDURATION
+    integer: true
+    nvs:
+      key: WDURATION
+    http:
+      write: true
+    default: 600
+
+  - name: lastwatering
+    caps_name: LASTWATERING
+    integer: true
+    nvs:
+      key: WLAST
+    http:
+      write: true
+    default: 0
+
+  - name: iswatering
+    caps_name: ISWATERING
+    integer: true
+    nvs:
+      key: ISWATERING
+    http:
+      write: true
+    default: 0
